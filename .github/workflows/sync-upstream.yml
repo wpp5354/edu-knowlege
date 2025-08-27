@@ -1,26 +1,33 @@
-name: Sync Upstream
+name: Sync Fork
+
 on:
   schedule:
-    - cron: "0 0 * * *"  # 每天 UTC 时间 00:00 同步（北京时间 08:00）
-  workflow_dispatch:     # 允许手动触发
+    - cron: "0 0 * * *"   # 每天 0 点（UTC 时间），注意北京时间要加 8 小时
+  workflow_dispatch:        # 允许手动触发
+
 jobs:
   sync:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Fork
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 获取完整历史记录（避免浅克隆问题）
 
-      - name: Add Upstream Remote
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set git
         run: |
-          git remote add upstream ${{ github.event.repository.parent.git_url }}
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream
+        run: |
+          git remote add upstream https://github.com/原作者/项目.git
           git fetch upstream
 
-      - name: Merge Upstream Changes
+      - name: Merge upstream changes
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git checkout main  # 切换到你的默认分支
-          git merge --no-edit upstream/main  # 自动合并上游 main 分支
+          git checkout main   # 如果你默认分支是 master 就改成 master
+          git merge upstream/main --no-edit || true
+
+      - name: Push changes
+        run: |
           git push origin main
