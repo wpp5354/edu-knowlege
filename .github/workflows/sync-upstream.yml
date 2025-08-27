@@ -20,7 +20,7 @@ jobs:
 
       - name: Add upstream
         run: |
-          git remote add upstream https://github.com/原作者/项目.git
+          git remote add upstream https://github.com/mswnlz/edu-knowlege.git
           git fetch upstream
 
       - name: Merge upstream changes
